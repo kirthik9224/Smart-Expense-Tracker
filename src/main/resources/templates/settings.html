@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings | Expense Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+        body { background:#f4f6f9; display:flex; }
+        .sidebar { width:260px; height:100vh; background:linear-gradient(180deg,#1d2671,#c33764); color:#fff; padding:20px; position:fixed; }
+        .sidebar h2 { text-align:center; margin-bottom:30px; font-weight:600; }
+        .sidebar a { display:flex; align-items:center; gap:12px; color:#fff; text-decoration:none; padding:12px 15px; margin:10px 0; border-radius:8px; transition:.3s; }
+        .sidebar a:hover,.sidebar a.active { background:rgba(255,255,255,.2); }
+        .sidebar i { font-size:18px; width:20px; text-align:center; }
+        .content { margin-left:260px; padding:30px; width:calc(100% - 260px); }
+        .header { background:#fff; padding:20px; border-radius:12px; margin-bottom:24px; box-shadow:0 5px 15px rgba(0,0,0,.1); }
+        .header h1 { font-size:26px; font-weight:600; }
+        .header p { color:#777; margin-top:5px; }
+        .settings-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+        .panel { background:#fff; padding:24px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,.08); }
+        .panel h2 { font-size:20px; margin-bottom:18px; }
+        .panel h2 i { color:#c33764; margin-right:8px; }
+        label { display:block; margin:12px 0 6px; font-size:14px; font-weight:600; }
+        input { width:100%; padding:11px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; outline:none; }
+        input:focus { border-color:#c33764; }
+        button { margin-top:16px; border:0; background:#c33764; color:#fff; padding:11px 18px; border-radius:8px; cursor:pointer; font-size:14px; }
+        button:hover { opacity:.9; }
+        .message { padding:12px 14px; border-radius:8px; margin-bottom:20px; background:#e8f5e9; color:#2e7d32; }
+        .error { background:#ffebee; color:#c62828; }
+        .info-row { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #eee; }
+        .info-row:last-child { border-bottom:0; }
+        .info-row i { color:#c33764; width:20px; }
+        @media(max-width:768px){ .sidebar{width:100%;height:auto;position:relative}.content{margin-left:0;width:100%} body{display:block}.settings-grid{grid-template-columns:1fr} }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Expense Tracker</h2>
+    <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/income"><i class="fas fa-wallet"></i> Income &amp; Savings</a>
+    <a href="/expense"><i class="fas fa-receipt"></i> Expense Management</a>
+    <a href="/expense_evaluation"><i class="fas fa-chart-pie"></i> Expense Evaluation</a>
+    <a href="/budget"><i class="fas fa-bell"></i> Budget &amp; Alerts</a>
+    <a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+<div class="content">
+    <div class="header">
+        <h1>Settings</h1>
+        <p>Manage your account and security settings</p>
+    </div>
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+    <div th:if="${error}" class="message error" th:text="${error}"></div>
+    <div class="settings-grid">
+        <div class="panel">
+            <h2><i class="fas fa-user"></i> Profile Settings</h2>
+            <form method="post" action="/settings/profile">
+                <label for="name">Name</label>
+                <input id="name" name="name" type="text" th:value="${user.name}" required>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" th:value="${user.email}" required>
+                <button type="submit"><i class="fas fa-save"></i> Save Profile</button>
+            </form>
+        </div>
+        <div class="panel">
+            <h2><i class="fas fa-lock"></i> Security</h2>
+            <form method="post" action="/settings/password">
+                <label for="currentPassword">Current Password</label>
+                <input id="currentPassword" name="currentPassword" type="password" required>
+                <label for="newPassword">New Password</label>
+                <input id="newPassword" name="newPassword" type="password" minlength="6" required>
+                <label for="confirmPassword">Confirm New Password</label>
+                <input id="confirmPassword" name="confirmPassword" type="password" minlength="6" required>
+                <button type="submit"><i class="fas fa-key"></i> Change Password</button>
+            </form>
+        </div>
+        <div class="panel">
+            <h2><i class="fas fa-circle-info"></i> Account Information</h2>
+            <div class="info-row"><i class="fas fa-user"></i><span th:text="${user.name}">User</span></div>
+            <div class="info-row"><i class="fas fa-envelope"></i><span th:text="${user.email}">Email</span></div>
+            <div class="info-row"><i class="fas fa-shield-halved"></i><span>Password is protected with BCrypt</span></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
