@@ -1,241 +1,172 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern enterprise expense management page with quick presets, search, and CSV export.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Expense Management | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1d2671, #c33764);
-            color: #fff;
-            padding: 20px;
-            position: fixed;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* Content */
-        .content {
-            margin-left: 260px;
-            padding: 30px;
-            width: calc(100% - 260px);
-        }
-
-        h2, h3 {
-            margin-bottom: 15px;
-        }
-
-        /* Flash messages */
-        .flash {
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            background: #ffe6e6;
-            color: #c0392b;
-            font-weight: 500;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-
-        /* Forms */
-        form input, form select, form button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-
-        form button {
-            background: linear-gradient(90deg, #1d2671, #c33764);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        form button:hover {
-            opacity: 0.9;
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th {
-            background: #1d2671;
-            color: white;
-            padding: 12px;
-        }
-
-        table td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table tr:hover {
-            background: #f1f1f1;
-        }
-
-        a.action {
-            color: #c33764;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        a.action:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
+<head th:replace="~{fragments/layout :: head}"></head>
 <body>
+  <div class="app-layout" data-page="expense" th:with="activePage='expense', pageTitle='Expense Management', pageSubtitle='Track, categorize, and control your household expenditures'">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
 
-<!-- Flash Messages -->
-<div th:if="${message}" class="flash" th:text="${message}"></div>
+    <div class="app-main">
+      <header th:replace="~{fragments/layout :: topbar}"></header>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h2>Expense Tracker</h2>
-    <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-    <a href="/income"><i class="fas fa-wallet"></i> Income & Savings</a>
-    <a href="/expense"><i class="fas fa-receipt"></i> Expense Management</a>
-    <a href="/expense_evaluation"><i class="fas fa-chart-pie"></i> Expense Evaluation</a>
-    <a href="/budget"><i class="fas fa-bell"></i> Budget & Alerts</a>
-    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+      <div class="page-container">
+        <!-- Feedback Flash Message -->
+        <div th:if="${message}" 
+             class="alert-banner"
+             th:classappend="${message.contains('exceeds') ? 'danger' : 'success'}">
+          <i th:class="${message.contains('exceeds') ? 'fas fa-triangle-exclamation' : 'fas fa-circle-check'}"></i>
+          <span th:text="${message}">Feedback message</span>
+        </div>
 
-<!-- Main Content -->
-<div class="content">
+        <!-- Add Expense Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-plus-circle"></i> Log New Expense</h2>
+          </div>
 
-    <!-- Add Expense -->
-    <div class="card">
-        <h2><i class="fas fa-plus-circle"></i> Add Expense</h2>
-        <form method="POST">
-            <input type="number" name="amount" placeholder="Amount" required>
-            <input type="date" name="date" required>
+          <form method="POST" action="/expense" id="addExpenseForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+              <div class="form-group">
+                <label class="form-label">Amount (₹)</label>
+                <input type="number" step="0.01" min="0.01" name="amount" id="mainExpAmount" class="form-control" placeholder="0.00" required>
+                <div class="quick-amounts">
+                  <span class="btn-preset" onclick="addAmount('mainExpAmount', 100)">+₹100</span>
+                  <span class="btn-preset" onclick="addAmount('mainExpAmount', 500)">+₹500</span>
+                  <span class="btn-preset" onclick="addAmount('mainExpAmount', 1000)">+₹1,000</span>
+                  <span class="btn-preset" onclick="addAmount('mainExpAmount', 5000)">+₹5,000</span>
+                </div>
+              </div>
 
-            <select name="category" required>
-                <option value="">Select Category</option>
-                <option>Food</option>
-                <option>Travel</option>
-                <option>Rent</option>
-                <option>Entertainment</option>
-                <option>Others</option>
-            </select>
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select name="category" class="form-control" required>
+                  <option value="Food & Groceries">🍔 Food & Groceries</option>
+                  <option value="Transport & Travel">🚗 Transport & Travel</option>
+                  <option value="Rent & Housing">🏠 Rent & Housing</option>
+                  <option value="Bills & Utilities">💡 Bills & Utilities</option>
+                  <option value="Healthcare & Medical">🩺 Healthcare & Medical</option>
+                  <option value="Education & Kids">🎓 Education & Kids</option>
+                  <option value="Entertainment">🎬 Entertainment</option>
+                  <option value="Shopping & Personal">🛍️ Shopping & Personal</option>
+                  <option value="Others">📦 Others</option>
+                </select>
+              </div>
 
-            <input type="text" name="description" placeholder="Description">
-            <button type="submit">Save Expense</button>
-        </form>
+              <div class="form-group">
+                <label class="form-label">Expense Date</label>
+                <input type="date" name="date" class="form-control auto-today-date" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Description / Merchant</label>
+                <input type="text" name="description" class="form-control" placeholder="E.g. Electricity bill, Organic store">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Add Expense Entry
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Expense History Table Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-list-check"></i> Expense History</h2>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <!-- Quick Search -->
+              <div style="position: relative; width: 220px;">
+                <input type="text" id="expenseSearchInput" class="form-control" 
+                       placeholder="Search expenses..." 
+                       onkeyup="filterTable('expenseSearchInput', 'expenseTable')"
+                       style="padding-left: 32px; font-size: 13px;">
+                <i class="fas fa-search" style="position: absolute; left: 10px; top: 12px; color: var(--text-muted); font-size: 13px;"></i>
+              </div>
+
+              <!-- Export CSV -->
+              <a href="/expense/export" class="btn btn-outline btn-sm" title="Download spreadsheet">
+                <i class="fas fa-file-csv"></i> Export CSV
+              </a>
+            </div>
+          </div>
+
+          <div th:if="${expenses.empty}" class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <h3>No Expenses Recorded</h3>
+            <p>Fill out the form above to record your first expense.</p>
+          </div>
+
+          <div th:unless="${expenses.empty}" class="table-responsive">
+            <table class="table-modern" id="expenseTable">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="exp : ${expenses}">
+                  <td>
+                    <span class="category-pill" th:text="${exp.category}">Category</span>
+                  </td>
+                  <td style="font-weight: 700; color: var(--rose-500);" 
+                      th:text="'- ₹ ' + ${#numbers.formatDecimal(exp.amount, 1, 'COMMA', 2, 'POINT')}">- ₹ 0.00</td>
+                  <td style="color: var(--text-muted); font-size: 13px;" th:text="${exp.expenseDate}">2026-10-11</td>
+                  <td th:text="${exp.description != null && !exp.description.blank ? exp.description : '—'}">Grocery</td>
+                  <td style="text-align: right;">
+                    <a th:href="@{'/edit_expense/' + ${exp.expenseId}}" class="btn btn-outline btn-sm" style="margin-right: 6px;">
+                      <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <button class="btn btn-danger btn-sm" 
+                            th:onclick="'confirmDelete(\'/delete_expense/' + ${exp.expenseId} + '\', \'expense entry\')'">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Monthly Summaries Overview -->
+        <div class="card" th:unless="${monthlyExpense.empty}">
+          <div class="card-header">
+            <h3><i class="fas fa-calendar-alt"></i> Month-wise Expense Summary</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table-modern">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th style="text-align: right;">Total Outflow</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="m : ${monthlyExpense}">
+                  <td>
+                    <strong th:text="${m.month}">2026-10</strong>
+                  </td>
+                  <td style="text-align: right; font-weight: 700; color: var(--rose-500);" 
+                      th:text="'₹ ' + ${#numbers.formatDecimal(m.totalExpense, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 
-    <!-- Expense History -->
-    <div class="card">
-        <h2><i class="fas fa-history"></i> Expense History</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-
-            <tr th:each="e : ${expenses}">
-                <td th:text="${e.expense_date}">-</td>
-                <td th:text="${e.category}">-</td>
-                <td th:text="|₹${e.amount}|">₹0</td>
-                <td th:text="${e.description}">-</td>
-                <td>
-                    <a class="action" th:href="@{/edit_expense/{id}(id=${e.expense_id})}">Edit</a> |
-                    <a class="action" th:href="@{/delete_expense/{id}(id=${e.expense_id})}"
-                       onclick="return confirm('Delete this expense?')">Delete</a>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Monthly Summary -->
-    <div class="card">
-        <h3><i class="fas fa-calendar"></i> Month-wise Expense Summary</h3>
-        <table>
-            <tr>
-                <th>Month</th>
-                <th>Total Expense</th>
-            </tr>
-
-            <tr th:each="m : ${monthlyExpense}">
-                <td th:text="${m.month}">-</td>
-                <td th:text="|₹${m.total_expense}|">₹0</td>
-            </tr>
-        </table>
-    </div>
-
-</div>
-
+  <div th:replace="~{fragments/layout :: quickAddModals}"></div>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

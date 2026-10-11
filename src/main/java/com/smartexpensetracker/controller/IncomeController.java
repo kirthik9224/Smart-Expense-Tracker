@@ -1,3 +1,7 @@
+/*
+ * Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+ * Description: Controller managing income records, savings allocations, and CSV export.
+ */
 package com.smartexpensetracker.controller;
 
 import com.smartexpensetracker.dto.IncomeRequest;
@@ -5,16 +9,19 @@ import com.smartexpensetracker.model.Income;
 import com.smartexpensetracker.model.MonthlyIncomeSummary;
 import com.smartexpensetracker.service.IncomeService;
 import com.smartexpensetracker.service.SavingsService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Controller managing income records, history, monthly earnings, and savings allocations.
+ * Controller managing income records, history, savings targets, and CSV exports.
  */
 @Controller
 public class IncomeController {
@@ -49,17 +56,22 @@ public class IncomeController {
         }
 
         List<Income> incomeList = incomeService.getIncomeHistory(userId);
-        List<MonthlyIncomeSummary> monthlyList = incomeService.getMonthlyIncomeSummaries(userId);
+        List<MonthlyIncomeSummary> monthlyList =
+                incomeService.getMonthlyIncomeSummaries(userId);
 
         String latestMonth = monthlyList.isEmpty() ? null : monthlyList.get(0).getMonth();
         Double latestTotal = monthlyList.isEmpty() ? 0.0 : monthlyList.get(0).getTotalIncome();
-        double savingsAmount = latestMonth != null ? savingsService.getSavingsForMonth(userId, latestMonth) : 0.0;
+        double savingsAmount = latestMonth != null
+                ? savingsService.getSavingsForMonth(userId, latestMonth)
+                : 0.0;
+        double totalAllTime = incomeList.stream().mapToDouble(Income::getAmount).sum();
 
         model.addAttribute("income", incomeList);
         model.addAttribute("monthlyIncome", monthlyList);
         model.addAttribute("latestMonth", latestMonth);
         model.addAttribute("latestTotal", latestTotal);
         model.addAttribute("savingsAmount", savingsAmount);
+        model.addAttribute("totalAllTime", totalAllTime);
 
         return "income";
     }
@@ -106,5 +118,33 @@ public class IncomeController {
         }
         savingsService.saveSavings(userId, month, savings);
         return "redirect:/income";
+    }
+
+    @GetMapping("/income/export")
+    public void exportToCsv(HttpSession session, HttpServletResponse response) throws IOException {
+        Integer userId = getAuthenticatedUserId(session);
+        if (userId == null) {
+            response.sendRedirect("/login");
+            return;
+        }
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"income.csv\"");
+
+        List<Income> list = incomeService.getIncomeHistory(userId);
+        PrintWriter writer = response.getWriter();
+        writer.println("Income ID,Amount,Date,Description");
+
+        for (Income inc : list) {
+            String safeDesc = inc.getDescription() != null
+                    ? inc.getDescription().replace("\"", "\"\"")
+                    : "";
+            writer.printf("%d,%.2f,%s,\"%s\"%n",
+                    inc.getIncomeId(),
+                    inc.getAmount(),
+                    inc.getIncomeDate(),
+                    safeDesc);
+        }
+        writer.flush();
     }
 }

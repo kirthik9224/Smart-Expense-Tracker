@@ -1,198 +1,266 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Interactive analytics page with 6-month trends, doughnut distribution, and category rankings.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Expense Evaluation | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1d2671, #c33764);
-            color: white;
-            padding: 20px;
-            position: fixed;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* Content */
-        .content {
-            margin-left: 260px;
-            padding: 30px;
-            width: calc(100% - 260px);
-        }
-
-        h2, h3 {
-            margin-bottom: 15px;
-        }
-
-        /* Card */
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-
-        /* Month selector */
-        select {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-        }
-
-        /* Charts */
-        canvas {
-            max-width: 600px;
-            margin: 20px auto;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
+<head th:replace="~{fragments/layout :: head}"></head>
 <body>
+  <div class="app-layout" data-page="evaluation" th:with="activePage='evaluation', pageTitle='Financial Analytics & Insights', pageSubtitle='Visual intelligence into your spending habits, trends, and budget distribution'">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h2>Expense Tracker</h2>
-    <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-    <a href="/income"><i class="fas fa-wallet"></i> Income & Savings</a>
-    <a href="/expense"><i class="fas fa-receipt"></i> Expense Management</a>
-    <a href="/expense_evaluation"><i class="fas fa-chart-pie"></i> Expense Evaluation</a>
-    <a href="/budget"><i class="fas fa-bell"></i> Budget & Alerts</a>
-    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+    <div class="app-main">
+      <header th:replace="~{fragments/layout :: topbar}"></header>
 
-<!-- Main Content -->
-<div class="content">
+      <div class="page-container">
+        <!-- Month Selector Bar -->
+        <div class="card" style="padding: 16px 24px; margin-bottom: 24px;">
+          <form method="get" action="/expense_evaluation" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <i class="fas fa-calendar-alt" style="color: var(--primary-500); font-size: 18px;"></i>
+              <strong style="font-size: 14px;">Evaluating Month:</strong>
+              <select name="month" class="form-control" onchange="this.form.submit()" style="width: auto; min-width: 160px; padding: 7px 12px;">
+                <option th:each="m : ${months}" 
+                        th:value="${m}" 
+                        th:text="${m}" 
+                        th:selected="${m == selectedMonth}"></option>
+              </select>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted);">
+              Data auto-refreshes when selecting a different month
+            </div>
+          </form>
+        </div>
 
-    <h2><i class="fas fa-chart-pie"></i> Expense Evaluation</h2>
+        <!-- Month KPI Stats -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-income">
+            <div class="kpi-meta">
+              <h3>Month Inflow</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(monthlyIncome, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-success">
+                <i class="fas fa-arrow-down"></i> Total Earnings
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+          </div>
 
-    <!-- Month Selector -->
-    <div class="card">
-        <form method="get">
-            <label><b>Select Month:</b></label><br><br>
-            <select name="month" onchange="this.form.submit()">
-                <option th:each="m : ${months}" th:value="${m}" th:text="${m}" th:selected="${m == selectedMonth}"></option>
-            </select>
-        </form>
+          <div class="kpi-card kpi-expense">
+            <div class="kpi-meta">
+              <h3>Month Outflow</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(totalExpense, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-danger">
+                <i class="fas fa-arrow-up"></i> Total Spent
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-receipt"></i>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-balance">
+            <div class="kpi-meta">
+              <h3>Net Surplus / Deficit</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(balance, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge" th:classappend="${balance >= 0 ? 'badge-success' : 'badge-danger'}">
+                <i th:class="${balance >= 0 ? 'fas fa-shield-halved' : 'fas fa-triangle-exclamation'}"></i>
+                <span th:text="${balance >= 0 ? 'Surplus Saved' : 'Overspent'}">Surplus</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-coins"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6-Month Cashflow Trend Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-chart-line"></i> 6-Month Cashflow Trend (Income vs Outflow)</h2>
+          </div>
+          <div style="height: 280px; position: relative;">
+            <canvas id="trendLineChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category Distribution & Rankings -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px;">
+          <!-- Doughnut Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-chart-pie"></i> Category Distribution Ratio</h2>
+            </div>
+            <div th:if="${categoryLabels.empty}" class="empty-state">
+              <i class="fas fa-chart-pie"></i>
+              <h3>No Expenses in Selected Month</h3>
+              <p>Select another month or record expenses to view chart breakdown.</p>
+            </div>
+            <div th:unless="${categoryLabels.empty}" style="max-width: 320px; margin: 0 auto; position: relative;">
+              <canvas id="doughnutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Category Spending Bar Chart -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-bars-progress"></i> Category Outflow Comparison</h2>
+            </div>
+            <div th:if="${categoryLabels.empty}" class="empty-state">
+              <i class="fas fa-chart-bar"></i>
+              <h3>No Category Data</h3>
+              <p>Add expenditures to compare category totals.</p>
+            </div>
+            <div th:unless="${categoryLabels.empty}" style="height: 280px; position: relative;">
+              <canvas id="categoryBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Breakdown Detail Table -->
+        <div class="card" th:unless="${categorySummaries.empty}">
+          <div class="card-header">
+            <h3><i class="fas fa-table-list"></i> Category Breakdown & Budget Share</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table-modern">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Total Spent</th>
+                  <th>Percentage Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="cat : ${categorySummaries}">
+                  <td>
+                    <span class="category-pill" th:text="${cat.category}">Category</span>
+                  </td>
+                  <td style="font-weight: 700; color: var(--rose-500);" 
+                      th:text="'₹ ' + ${#numbers.formatDecimal(cat.total, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</td>
+                  <td style="width: 40%;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div style="flex: 1; height: 8px; background: var(--bg-surface-subtle); border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; background: linear-gradient(90deg, var(--primary-500), var(--rose-500));" 
+                             th:styleappend="'width: ' + ${totalExpense > 0 ? (cat.total / totalExpense) * 100 : 0} + '%;'"></div>
+                      </div>
+                      <span style="font-size: 13px; font-weight: 600; min-width: 45px;" 
+                            th:text="${totalExpense > 0 ? #numbers.formatDecimal((cat.total / totalExpense) * 100, 1, 1) + '%' : '0%'}">0%</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 
-    <!-- Pie Chart -->
-    <div class="card">
-        <h3><i class="fas fa-coins"></i> Spent vs Balance</h3>
-        <canvas id="pieChart"></canvas>
-    </div>
+  <div th:replace="~{fragments/layout :: quickAddModals}"></div>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 
-    <!-- Bar Chart -->
-    <div class="card">
-        <h3><i class="fas fa-layer-group"></i> Category-wise Expense</h3>
-        <canvas id="barChart"></canvas>
-    </div>
+  <!-- Chart.js Setup Scripts -->
+  <script th:inline="javascript">
+    const catLabels = /*[[${categoryLabels}]]*/ [];
+    const catValues = /*[[${categoryValues}]]*/ [];
+    const trendMonths = /*[[${trendMonths}]]*/ [];
+    const trendIncomes = /*[[${trendIncomes}]]*/ [];
+    const trendExpenses = /*[[${trendExpenses}]]*/ [];
 
-</div>
+    const palette = [
+      '#6366F1', '#10B981', '#F43F5E', '#F59E0B', '#0EA5E9',
+      '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#64748B'
+    ];
 
-<!-- ================= JINJA → JS SAFE VARIABLES ================= -->
-<script th:inline="javascript">
-    const totalExpense = /*[[${totalExpense}]]*/ 0;
-    const balanceAmount = /*[[${balance > 0 ? balance : 0}]]*/ 0;
-    const categoryLabels = /*[[${categoryLabels}]]*/ [];
-    const categoryValues = /*[[${categoryValues}]]*/ [];
-</script>
-
-<!-- ================= PIE CHART ================= -->
-<script>
-    new Chart(document.getElementById("pieChart"), {
-        type: 'pie',
+    // 1. Trend Line Chart
+    if (trendMonths && trendMonths.length > 0) {
+      new Chart(document.getElementById('trendLineChart'), {
+        type: 'line',
         data: {
-            labels: ['Spent', 'Balance'],
-            datasets: [{
-                data: [totalExpense, balanceAmount],
-                backgroundColor: ['#c33764', '#1d2671']
-            }]
-        }
-    });
-</script>
-
-<!-- ================= BAR CHART ================= -->
-<script>
-    new Chart(document.getElementById("barChart"), {
-        type: 'bar',
-        data: {
-            labels: categoryLabels,
-            datasets: [{
-                label: 'Expense Amount',
-                data: categoryValues,
-                backgroundColor: '#c33764'
-            }]
+          labels: trendMonths,
+          datasets: [
+            {
+              label: 'Income (₹)',
+              data: trendIncomes,
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.35,
+              fill: true,
+              pointRadius: 4
+            },
+            {
+              label: 'Expense (₹)',
+              data: trendExpenses,
+              borderColor: '#F43F5E',
+              backgroundColor: 'rgba(244, 63, 94, 0.08)',
+              tension: 0.35,
+              fill: true,
+              pointRadius: 4
+            }
+          ]
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Inter' } } }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
         }
-    });
-</script>
+      });
+    }
 
+    // 2. Doughnut Chart
+    if (catLabels && catLabels.length > 0) {
+      new Chart(document.getElementById('doughnutChart'), {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catValues,
+            backgroundColor: palette,
+            borderWidth: 2,
+            borderColor: 'var(--bg-surface)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }
+          },
+          cutout: '68%'
+        }
+      });
+
+      // 3. Bar Chart
+      new Chart(document.getElementById('categoryBarChart'), {
+        type: 'bar',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            label: 'Amount (₹)',
+            data: catValues,
+            backgroundColor: palette.slice(0, catLabels.length),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1,197 +1,233 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern enterprise dashboard with live KPI cards, charts, and recent activity.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1d2671, #c33764);
-            color: #fff;
-            padding: 20px;
-            position: fixed;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .sidebar i {
-            font-size: 18px;
-        }
-
-        /* Main Content */
-        .content {
-            margin-left: 260px;
-            padding: 30px;
-            width: calc(100% - 260px);
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 26px;
-            font-weight: 600;
-        }
-
-        .header p {
-            color: #777;
-            margin-top: 5px;
-        }
-
-        /* Dashboard Cards */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-link {
-            display: block;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .card i {
-            font-size: 30px;
-            margin-bottom: 15px;
-            color: #c33764;
-        }
-
-        .card h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .card p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
+<head th:replace="~{fragments/layout :: head}"></head>
 <body>
+  <div class="app-layout" data-page="dashboard" th:with="activePage='dashboard', pageTitle='Financial Dashboard', pageSubtitle='Welcome back, ' + ${session.user_name} + ' — Here is your monthly overview'">
+    <!-- Sidebar Fragment -->
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h2>Expense Tracker</h2>
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <!-- Topbar Fragment -->
+      <header th:replace="~{fragments/layout :: topbar}"></header>
 
-    <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-    <a href="/income"><i class="fas fa-wallet"></i> Income & Savings</a>
-    <a href="/expense"><i class="fas fa-receipt"></i> Expense Management</a>
-    <a href="/expense_evaluation"><i class="fas fa-chart-pie"></i> Expense Evaluation</a>
-    <a href="/budget"><i class="fas fa-bell"></i> Budget & Alerts</a>
-    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+      <div class="page-container">
+        <!-- Health Alert Banner -->
+        <div th:if="${budgetSummary != null}" 
+             class="alert-banner" 
+             th:classappend="${budgetSummary.alertType}">
+          <i class="fas fa-shield-alt"></i>
+          <div style="flex: 1;">
+            <strong th:if="${budgetSummary.alertType == 'success'}">Financial Health: Excellent</strong>
+            <strong th:if="${budgetSummary.alertType == 'warning'}">Financial Health: Caution Advised</strong>
+            <strong th:if="${budgetSummary.alertType == 'danger'}">Financial Health: Budget Exceeded</strong>
+            <strong th:if="${budgetSummary.alertType == 'info'}">Financial Health: Awaiting Input</strong>
+            <span th:text="' — ' + ${budgetSummary.message}"></span>
+          </div>
+          <a href="/budget" class="btn btn-outline btn-sm">Manage Budget</a>
+        </div>
 
-<!-- Main Content -->
-<div class="content">
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid">
+          <!-- Balance Card -->
+          <div class="kpi-card kpi-balance">
+            <div class="kpi-meta">
+              <h3>Net Balance</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(netBalance, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge" th:classappend="${netBalance >= 0 ? 'badge-success' : 'badge-danger'}">
+                <i th:class="${netBalance >= 0 ? 'fas fa-arrow-trend-up' : 'fas fa-arrow-trend-down'}"></i>
+                <span th:text="${netBalance >= 0 ? 'Positive Cashflow' : 'Negative Deficit'}">Cashflow</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-wallet"></i>
+            </div>
+          </div>
 
-    <div class="header">
-        <h1>Welcome, <span th:text="${session.user_name}">User</span> 👋</h1>
-        <p>Track, analyze, and manage your monthly expenses efficiently</p>
+          <!-- Income Card -->
+          <div class="kpi-card kpi-income">
+            <div class="kpi-meta">
+              <h3>Monthly Income</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(totalIncome, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-success">
+                <i class="fas fa-calendar-check"></i>
+                <span th:text="${currentMonth}">Current Month</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+          </div>
+
+          <!-- Expense Card -->
+          <div class="kpi-card kpi-expense">
+            <div class="kpi-meta">
+              <h3>Total Expenses</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(totalExpense, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge" th:classappend="${totalExpense > totalIncome ? 'badge-danger' : 'badge-info'}">
+                <i class="fas fa-credit-card"></i>
+                <span th:text="${totalIncome > 0 ? #numbers.formatDecimal((totalExpense / totalIncome) * 100, 1, 0) + '% of Income' : '0% of Income'}">0%</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-receipt"></i>
+            </div>
+          </div>
+
+          <!-- Savings Rate Card -->
+          <div class="kpi-card kpi-savings">
+            <div class="kpi-meta">
+              <h3>Savings Retention</h3>
+              <div class="kpi-value" th:text="${savingsRate} + '%'">0%</div>
+              <div class="kpi-badge badge-warning">
+                <i class="fas fa-bullseye"></i>
+                <span th:text="'Target: ₹ ' + ${#numbers.formatDecimal(savingsGoal, 1, 'COMMA', 0, 'POINT')}">Target: ₹ 0</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-piggy-bank"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Analytics & Recent Activity Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+          <!-- Category Spending Breakdown Chart -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-chart-pie"></i> Category Distribution</h2>
+              <a href="/expense_evaluation" class="btn btn-outline btn-sm">Full Analytics</a>
+            </div>
+
+            <div th:if="${categoryLabels.empty}" class="empty-state">
+              <i class="fas fa-chart-simple"></i>
+              <h3>No Expenses This Month</h3>
+              <p>Add your first expense to visualize your household spending categories.</p>
+              <button class="btn btn-primary btn-sm" onclick="openModal('quickExpenseModal')">
+                <i class="fas fa-plus"></i> Add Expense
+              </button>
+            </div>
+
+            <div th:unless="${categoryLabels.empty}">
+              <div style="position: relative; max-width: 320px; margin: 0 auto 20px;">
+                <canvas id="categoryChart"></canvas>
+              </div>
+
+              <!-- Top Categories Pills -->
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <div th:each="cat : ${categorySummaries}" 
+                     style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-md);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="category-pill" th:text="${cat.category}">Category</span>
+                  </div>
+                  <strong style="font-size: 14px;" th:text="'₹ ' + ${#numbers.formatDecimal(cat.total, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-clock-rotate-left"></i> Recent Transactions</h2>
+              <a href="/expense" class="btn btn-outline btn-sm">View All</a>
+            </div>
+
+            <div th:if="${recentExpenses.empty}" class="empty-state">
+              <i class="fas fa-receipt"></i>
+              <h3>No Recent Records</h3>
+              <p>Your recent transactions will appear here once recorded.</p>
+              <button class="btn btn-emerald btn-sm" onclick="openModal('quickIncomeModal')">
+                <i class="fas fa-plus"></i> Add Income
+              </button>
+            </div>
+
+            <div th:unless="${recentExpenses.empty}" class="table-responsive">
+              <table class="table-modern">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th style="text-align: right;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="exp : ${recentExpenses}">
+                    <td>
+                      <span class="category-pill" th:text="${exp.category}">Category</span>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 13px;" th:text="${exp.expenseDate}">2026-10-11</td>
+                    <td style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                        th:text="${exp.description != null && !exp.description.blank ? exp.description : '—'}">Grocery</td>
+                    <td style="text-align: right; font-weight: 600; color: var(--rose-500);" 
+                        th:text="'- ₹ ' + ${#numbers.formatDecimal(exp.amount, 1, 'COMMA', 2, 'POINT')}">- ₹ 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+              <button class="btn btn-primary btn-sm" onclick="openModal('quickExpenseModal')">
+                <i class="fas fa-plus"></i> Add Expense
+              </button>
+              <button class="btn btn-emerald btn-sm" onclick="openModal('quickIncomeModal')">
+                <i class="fas fa-plus"></i> Add Income
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 
-    <!-- Dashboard Cards -->
-    <div class="cards">
-        <a class="card card-link" href="/income">
-            <i class="fas fa-wallet"></i>
-            <h3>Income & Savings</h3>
-            <p>Manage your monthly income and savings</p>
-        </a>
+  <!-- Reusable Modals & Scripts -->
+  <div th:replace="~{fragments/layout :: quickAddModals}"></div>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 
-        <a class="card card-link" href="/expense">
-            <i class="fas fa-receipt"></i>
-            <h3>Expenses</h3>
-            <p>Add, edit and track your expenses</p>
-        </a>
+  <!-- Dashboard Category Chart Script -->
+  <script th:inline="javascript">
+    const catLabels = /*[[${categoryLabels}]]*/ [];
+    const catValues = /*[[${categoryValues}]]*/ [];
 
-        <a class="card card-link" href="/expense_evaluation">
-            <i class="fas fa-chart-pie"></i>
-            <h3>Analytics</h3>
-            <p>Visualize spending patterns and balance</p>
-        </a>
-
-        <a class="card card-link" href="/budget">
-            <i class="fas fa-bell"></i>
-            <h3>Budget Alerts</h3>
-            <p>Get notified when you exceed limits</p>
-        </a>
-    </div>
-
-</div>
-
+    if (catLabels && catLabels.length > 0) {
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catValues,
+            backgroundColor: [
+              '#6366F1', '#10B981', '#F43F5E', '#F59E0B', '#0EA5E9',
+              '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#64748B'
+            ],
+            borderWidth: 2,
+            borderColor: 'var(--bg-surface)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 14,
+                font: { family: 'Inter', size: 12 }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1,138 +1,73 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern edit expense page adhering to fintech design tokens.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Expense | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1d2671, #c33764);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            width: 100%;
-            max-width: 420px;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: #1d2671;
-            font-weight: 600;
-        }
-
-        .back-btn i {
-            margin-right: 6px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #1d2671;
-        }
-
-        label {
-            font-weight: 500;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-        }
-
-        select {
-            background: white;
-            cursor: pointer;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, #1d2671, #c33764);
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-
+<head th:replace="~{fragments/layout :: head}"></head>
 <body>
+  <div class="app-layout" data-page="expense" th:with="activePage='expense', pageTitle='Edit Expense Record', pageSubtitle='Update the details for transaction #' + ${data.expenseId}">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
 
-<div class="container">
+    <div class="app-main">
+      <header th:replace="~{fragments/layout :: topbar}"></header>
 
-    <!-- Back Button -->
-    <a href="/expense" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Back
-    </a>
+      <div class="page-container">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+          <div class="card-header">
+            <h2><i class="fas fa-edit"></i> Modify Transaction Details</h2>
+            <a href="/expense" class="btn btn-outline btn-sm">
+              <i class="fas fa-arrow-left"></i> Back to Expenses
+            </a>
+          </div>
 
-    <h2>Edit Expense</h2>
+          <form method="POST" th:action="@{'/edit_expense/' + ${data.expenseId}}">
+            <div class="form-group">
+              <label class="form-label">Amount (₹)</label>
+              <input type="number" step="0.01" min="0.01" name="amount" class="form-control" 
+                     th:value="${data.amount}" required>
+            </div>
 
-    <form method="POST">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select name="category" class="form-control" required>
+                <option value="Food & Groceries" th:selected="${data.category == 'Food & Groceries' || data.category == 'Food'}">🍔 Food & Groceries</option>
+                <option value="Transport & Travel" th:selected="${data.category == 'Transport & Travel' || data.category == 'Travel'}">🚗 Transport & Travel</option>
+                <option value="Rent & Housing" th:selected="${data.category == 'Rent & Housing' || data.category == 'Rent'}">🏠 Rent & Housing</option>
+                <option value="Bills & Utilities" th:selected="${data.category == 'Bills & Utilities'}">💡 Bills & Utilities</option>
+                <option value="Healthcare & Medical" th:selected="${data.category == 'Healthcare & Medical'}">🩺 Healthcare & Medical</option>
+                <option value="Education & Kids" th:selected="${data.category == 'Education & Kids'}">🎓 Education & Kids</option>
+                <option value="Entertainment" th:selected="${data.category == 'Entertainment'}">🎬 Entertainment</option>
+                <option value="Shopping & Personal" th:selected="${data.category == 'Shopping & Personal'}">🛍️ Shopping & Personal</option>
+                <option value="Others" th:selected="${data.category == 'Others'}">📦 Others</option>
+              </select>
+            </div>
 
-        <label>Amount</label>
-        <input type="number" name="amount" th:value="${data.amount}" required>
+            <div class="form-group">
+              <label class="form-label">Expense Date</label>
+              <input type="date" name="date" class="form-control" 
+                     th:value="${data.expenseDate}" required>
+            </div>
 
-        <label>Date</label>
-        <input type="date" name="date" th:value="${data.expense_date}" required>
+            <div class="form-group">
+              <label class="form-label">Description / Note</label>
+              <input type="text" name="description" class="form-control" 
+                     th:value="${data.description}" placeholder="Description">
+            </div>
 
-        <label>Category</label>
-        <select name="category">
-            <option value="Food" th:selected="${data.category == 'Food'}">Food</option>
-            <option value="Travel" th:selected="${data.category == 'Travel'}">Travel</option>
-            <option value="Rent" th:selected="${data.category == 'Rent'}">Rent</option>
-            <option value="Entertainment" th:selected="${data.category == 'Entertainment'}">Entertainment</option>
-            <option value="Others" th:selected="${data.category == 'Others'}">Others</option>
-        </select>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+              <a href="/expense" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+              <button type="submit" class="btn btn-primary" style="flex: 2;">
+                <i class="fas fa-check"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <label>Description</label>
-        <input type="text" name="description" th:value="${data.description}">
-
-        <button type="submit">Update Expense</button>
-
-    </form>
-
-</div>
-
+  <div th:replace="~{fragments/layout :: quickAddModals}"></div>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

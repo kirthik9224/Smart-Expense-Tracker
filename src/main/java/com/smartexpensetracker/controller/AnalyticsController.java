@@ -1,5 +1,10 @@
+/*
+ * Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+ * Description: Controller managing visual expense evaluations, category charts, and trends.
+ */
 package com.smartexpensetracker.controller;
 
+import com.smartexpensetracker.model.CategorySummary;
 import com.smartexpensetracker.service.AnalyticsService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -7,11 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Controller managing expense evaluations, category distributions, and analytics charts.
+ * Controller managing visual expense evaluations, category distributions, and trend charts.
  */
 @Controller
 public class AnalyticsController {
@@ -38,29 +44,33 @@ public class AnalyticsController {
 
         List<String> months = analyticsService.getAvailableMonths(userId);
         String selectedMonth = (month == null || month.isBlank())
-                ? (months.isEmpty() ? null : months.get(0))
+                ? (months.isEmpty() ? YearMonth.now().toString() : months.get(0))
                 : month;
 
-        double income = 0.0;
-        double expense = 0.0;
-        List<String> categoryLabels = Collections.emptyList();
-        List<Double> categoryValues = Collections.emptyList();
-
-        if (selectedMonth != null) {
-            income = analyticsService.getMonthlyIncome(userId, selectedMonth);
-            expense = analyticsService.getMonthlyExpense(userId, selectedMonth);
-            categoryLabels = analyticsService.getCategoryLabels(userId, selectedMonth);
-            categoryValues = analyticsService.getCategoryValues(userId, selectedMonth);
-        }
+        double income = analyticsService.getMonthlyIncome(userId, selectedMonth);
+        double expense = analyticsService.getMonthlyExpense(userId, selectedMonth);
+        List<CategorySummary> categorySummaries =
+                analyticsService.getCategorySummaries(userId, selectedMonth);
+        List<String> categoryLabels = analyticsService.getCategoryLabels(userId, selectedMonth);
+        List<Double> categoryValues = analyticsService.getCategoryValues(userId, selectedMonth);
 
         double balance = income - expense;
 
+        List<String> trendMonths = analyticsService.getRecentMonthsList(6);
+        List<Double> trendIncomes = analyticsService.getTrendIncomes(userId, trendMonths);
+        List<Double> trendExpenses = analyticsService.getTrendExpenses(userId, trendMonths);
+
         model.addAttribute("months", months);
         model.addAttribute("selectedMonth", selectedMonth);
+        model.addAttribute("monthlyIncome", income);
         model.addAttribute("totalExpense", expense);
         model.addAttribute("balance", balance);
+        model.addAttribute("categorySummaries", categorySummaries);
         model.addAttribute("categoryLabels", categoryLabels);
         model.addAttribute("categoryValues", categoryValues);
+        model.addAttribute("trendMonths", trendMonths);
+        model.addAttribute("trendIncomes", trendIncomes);
+        model.addAttribute("trendExpenses", trendExpenses);
 
         return "expense_evaluation";
     }

@@ -1,890 +1,547 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern high-converting fintech landing page with dark/light mode and interactive previews.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-
 <head>
-    <title>Smart Expense Tracker</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: "Open Sans", sans-serif;
-        }
-
-        :root {
-            --primary: #2D3E50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #1a202c;
-            --text: #2c3e50;
-            --text-light: #7f8c8d;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, #3498db, #2c3e50);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-            background-color: var(--light);
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: "Montserrat", sans-serif;
-            font-weight: 600;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .section {
-            padding: 100px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
-            position: relative;
-            display: inline-block;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-
-        .section-title h2::after {
-            content: '';
-            position: absolute;
-            width: 60px;
-            height: 3px;
-            background: var(--secondary);
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .section-title p {
-            color: var(--text-light);
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 20px auto 0;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background: var(--secondary);
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-            border-radius: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
-            border: 2px solid var(--secondary);
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn:hover {
-            background: transparent;
-            color: var(--secondary);
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn-accent {
-            background: var(--accent);
-            border-color: var(--accent);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-        }
-
-        .btn-accent:hover {
-            color: var(--accent);
-            box-shadow: 0 7px 20px rgba(231, 76, 60, 0.4);
-        }
-
-        /* Navigation Styles */
-        nav {
-            width: 100%;
-            position: fixed;
-            top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-
-        nav .topNav {
-            background: var(--primary);
-            padding: 10px 0;
-        }
-
-        nav .topNav .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        nav .topNav .container .icons i {
-            color: var(--white);
-            margin-right: 20px;
-            font-size: 16px;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        nav .topNav .container .icons i:hover {
-            color: var(--secondary);
-            transform: translateY(-2px);
-        }
-
-        nav .bottomNav {
-            padding: 20px 0;
-        }
-
-        nav .bottomNav .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        nav .bottomNav .container .logo {
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: var(--primary);
-            font-family: "Montserrat", sans-serif;
-        }
-
-        nav .bottomNav .container .logo span {
-            color: var(--accent);
-        }
-
-        nav .bottomNav .container .menu {
-            display: flex;
-        }
-
-        nav .bottomNav .container .menu a {
-            text-decoration: none;
-            text-transform: uppercase;
-            color: var(--text);
-            margin-left: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            position: relative;
-            transition: var(--transition);
-            font-family: "Montserrat", sans-serif;
-            letter-spacing: 0.5px;
-        }
-
-        nav .bottomNav .container .menu a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            background: var(--secondary);
-            bottom: -5px;
-            left: 0;
-            transition: var(--transition);
-        }
-
-        nav .bottomNav .container .menu a:hover {
-            color: var(--secondary);
-        }
-
-        nav .bottomNav .container .menu a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Section */
-        .hero {
-            width: 100%;
-            min-height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://api.placeholder.com/1600/900") no-repeat center/cover;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-top: 80px;
-        }
-
-        .hero .container {
-            color: var(--white);
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero .container .badge {
-            background: var(--accent);
-            color: var(--white);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .hero .container h1 {
-            font-size: 4rem;
-            line-height: 1.2;
-            margin-bottom: 30px;
-            font-weight: 700;
-        }
-
-        .hero .container h1 span {
-            color: var(--secondary);
-        }
-
-        .hero .container p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 40px;
-            max-width: 600px;
-        }
-
-        .hero .container .hero-btns {
-            display: flex;
-            gap: 20px;
-        }
-
-        /* Services Section */
-        .services {
-            background-color: var(--white);
-        }
-
-        .services .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .service-card {
-            background: var(--white);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-
-
-
-        .service-card:hover .card-img img {
-            transform: scale(1.1);
-        }
-
-        .service-card .card-content {
-            padding: 30px;
-        }
-
-        .service-card .card-content h3 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .service-card .card-content p {
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        .service-card .card-content .card-link {
-            display: inline-block;
-            color: var(--secondary);
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .service-card .card-content .card-link:hover {
-            color: var(--accent);
-            transform: translateX(5px);
-        }
-
-        /* Features Section */
-        .features {
-            background-color: #f8f9fa;
-        }
-
-        .features .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 40px 30px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card .icon {
-            width: 70px;
-            height: 70px;
-            line-height: 70px;
-            border-radius: 50%;
-            background: var(--gradient);
-            margin: 0 auto 25px;
-            color: var(--white);
-            font-size: 28px;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover .icon {
-            transform: rotateY(360deg);
-        }
-
-        .feature-card h3 {
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .feature-card p {
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        /* Stats Section */
-        .stats {
-            background: var(--gradient);
-            color: var(--white);
-            padding: 80px 0;
-        }
-
-        .stats .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            text-align: center;
-        }
-
-        .stat-item h2 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .stat-item p {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        /* Gallery Section */
-        .gallery .container {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: repeat(2, 250px);
-            gap: 20px;
-        }
-
-        .gallery-item {
-            overflow: hidden;
-            border-radius: 10px;
-            position: relative;
-            box-shadow: var(--shadow);
-        }
-
-        .gallery-item:first-child {
-            grid-column: span 6;
-            grid-row: span 2;
-        }
-
-        .gallery-item:nth-child(2) {
-            grid-column: span 6;
-        }
-
-        .gallery-item:nth-child(3) {
-            grid-column: span 4;
-        }
-
-        .gallery-item:nth-child(4) {
-            grid-column: span 8;
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
-
-        .gallery-item .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(52, 152, 219, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover .overlay {
-            opacity: 1;
-        }
-
-        .gallery-item .overlay i {
-            font-size: 40px;
-            color: var(--white);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: var(--white);
-            padding: 80px 0 30px;
-        }
-
-        footer .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-
-        footer .footer-box h3 {
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        footer .footer-box h3::after {
-            content: '';
-            position: absolute;
-            width: 40px;
-            height: 2px;
-            background: var(--secondary);
-            bottom: 0;
-            left: 0;
-        }
-
-        footer .footer-box p {
-            color: #bdc3c7;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
-
-        footer .footer-box .social-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        footer .footer-box .social-icons i {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--white);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        footer .footer-box .social-icons i:hover {
-            background: var(--secondary);
-            transform: translateY(-5px);
-        }
-
-        footer .footer-box .email-form {
-            display: flex;
-            margin-top: 20px;
-        }
-
-        footer .footer-box .email-form input {
-            flex: 1;
-            padding: 12px 15px;
-            border: none;
-            outline: none;
-            border-radius: 30px 0 0 30px;
-        }
-
-        footer .footer-box .email-form .submit-btn {
-            padding: 0 20px;
-            background: var(--secondary);
-            color: var(--white);
-            border: none;
-            border-radius: 0 30px 30px 0;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        footer .footer-box .email-form .submit-btn:hover {
-            background: var(--accent);
-        }
-
-        footer .copyright {
-            text-align: center;
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #bdc3c7;
-            font-size: 0.9rem;
-        }
-
-        footer .copyright a {
-            color: var(--secondary);
-            text-decoration: none;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .hero .container h1 {
-                font-size: 3rem;
-            }
-            
-            .gallery .container {
-                grid-template-rows: repeat(auto-fit, 200px);
-            }
-            
-            .gallery-item:first-child {
-                grid-column: span 12;
-            }
-            
-            .gallery-item:nth-child(2) {
-                grid-column: span 6;
-            }
-            
-            .gallery-item:nth-child(3) {
-                grid-column: span 6;
-            }
-            
-            .gallery-item:nth-child(4) {
-                grid-column: span 12;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .section {
-                padding: 70px 0;
-            }
-            
-            .hero .container h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero .container p {
-                font-size: 1rem;
-            }
-            
-            .hero .container .hero-btns {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .section-title h2 {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            nav .bottomNav .container .menu {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Tracker | Intelligent Family & Personal Finance</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- App Design Tokens -->
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+
+  <!-- Inline Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <style>
+    /* Landing-Specific Custom Enhancements */
+    .landing-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg-surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 0;
+      transition: all var(--transition-normal);
+    }
+    .landing-nav .nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .landing-nav .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .landing-nav .nav-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color var(--transition-fast);
+    }
+    .landing-nav .nav-link:hover {
+      color: var(--primary-500);
+    }
+
+    /* Hero Section */
+    .hero-wrap {
+      background: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.16) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 70%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+                  radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+                  var(--bg-app);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .hero-section {
+      padding: 90px 24px 80px;
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 48px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--primary-50);
+      color: var(--primary-600);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border: 1px solid var(--primary-200);
+    }
+    .hero-title {
+      font-size: 48px;
+      line-height: 1.15;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary-500), #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-description {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Hero Interactive Preview Card */
+    .preview-card {
+      background: var(--bg-surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-xl);
+      padding: 28px;
+      position: relative;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Features Section */
+    .features-section {
+      padding: 90px 24px;
+      background: var(--bg-surface-subtle);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .section-wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .section-heading {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 56px;
+    }
+    .section-heading h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .section-heading p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+    .feature-card {
+      background: var(--bg-surface);
+      padding: 28px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-normal);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-500);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Steps Section */
+    .steps-section {
+      padding: 90px 24px;
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+    .step-card {
+      position: relative;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+    }
+    .step-number {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--primary-200);
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    /* Footer */
+    .landing-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 60px 24px 30px;
+    }
+    .footer-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+    .copyright-bar {
+      max-width: 1240px;
+      margin: 40px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        padding: 50px 20px;
+      }
+      .hero-title {
+        font-size: 36px;
+      }
+      .landing-nav .nav-links {
+        display: none;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <nav>
-        <div class="topNav">
-            <div class="container">
-                <div class="icons">
-                    <i class="fab fa-facebook-f"></i>
-                    <i class="fab fa-twitter"></i>
-                    <i class="fab fa-instagram"></i>
-                    <i class="fab fa-linkedin-in"></i>
-                </div>
-            </div>
-        </div>
-        <div class="bottomNav">
-            <div class="container">
-                <div class="logo">
-                    Smart<span>Save</span>
-                </div>
-                <div class="menu">
-                    <a href="#">Home</a>
-                    
-                    <a href="/register">Sign Up</a>
-                    <a href="/login">Login</a>
-                   
-                    <a href="#footer">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-   <section class="hero">
-    <div class="container">
-       
-        <h1>Smart Student <span>Expense Tracker</span></h1>
-        <p>
-            Our intelligent expense tracking system helps students monitor daily spending,
-            analyze habits, and receive smart suggestions to save money and manage finances efficiently.
+  <!-- Navigation Bar -->
+  <nav class="landing-nav">
+    <div class="nav-container">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="brand-icon" style="width: 36px; height: 36px; font-size: 16px;">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--text-main);">
+          SmartTracker
+        </span>
+      </div>
+
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#guardrails" class="nav-link">Budget Guardrails</a>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+        <a href="/login" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="/register" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="hero-wrap">
+  <section class="hero-section">
+    <div>
+      <div class="hero-badge">
+        <i class="fas fa-sparkles"></i>
+        <span>Spring Boot 4 • Personal & Household Finance</span>
+      </div>
+      <h1 class="hero-title">
+        Master Your Money with <span>Intelligent Expense Tracking</span>
+      </h1>
+      <p class="hero-description">
+        Track daily expenses, set automated savings guardrails, evaluate category trends, 
+        and protect your family's financial future with interactive analytics.
+      </p>
+      <div class="hero-cta">
+        <a href="/register" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;">
+          <i class="fas fa-rocket"></i> Start Tracking Free
+        </a>
+        <a href="/login" class="btn btn-outline" style="padding: 12px 24px; font-size: 15px;">
+          <i class="fas fa-arrow-right-to-bracket"></i> Login to Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Interactive Live Preview Card -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #EF4444;"></div>
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #F59E0B;"></div>
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #10B981;"></div>
+          <span style="font-size: 12px; color: var(--text-muted); margin-left: 8px; font-weight: 600;">Live Simulation</span>
+        </div>
+        <span class="category-pill" style="font-size: 11px;">Safe Status</span>
+      </div>
+
+      <!-- Mini KPI Simulation -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div style="background: var(--bg-surface-subtle); padding: 14px; border-radius: var(--radius-md);">
+          <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Monthly Inflow</div>
+          <div style="font-size: 20px; font-weight: 700; color: var(--emerald-500); margin-top: 4px;">+ ₹ 75,000</div>
+        </div>
+        <div style="background: var(--bg-surface-subtle); padding: 14px; border-radius: var(--radius-md);">
+          <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Outflow</div>
+          <div style="font-size: 20px; font-weight: 700; color: var(--rose-500); margin-top: 4px;">- ₹ 32,450</div>
+        </div>
+      </div>
+
+      <!-- Budget Progress Simulation -->
+      <div style="margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+          <span>Savings Locked: ₹ 20,000</span>
+          <span style="color: var(--emerald-500);">Net Remaining: ₹ 22,550</span>
+        </div>
+        <div style="height: 10px; background: var(--bg-surface-subtle); border-radius: 5px; overflow: hidden;">
+          <div style="height: 100%; width: 59%; background: linear-gradient(90deg, #10B981, #6366F1);"></div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions Simulation -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="category-pill" style="font-size: 11px;">🍔 Groceries</span>
+            <span>Supermarket</span>
+          </div>
+          <strong style="color: var(--rose-500);">- ₹ 2,450</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="category-pill" style="font-size: 11px;">💡 Utilities</span>
+            <span>Electricity Bill</span>
+          </div>
+          <strong style="color: var(--rose-500);">- ₹ 1,820</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="category-pill" style="font-size: 11px;">🚗 Travel</span>
+            <span>Fuel Refill</span>
+          </div>
+          <strong style="color: var(--rose-500);">- ₹ 950</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- Key Features Grid -->
+  <section class="features-section" id="features">
+    <div class="section-wrap">
+      <div class="section-heading">
+        <h2>Built for Complete Financial Control</h2>
+        <p>Everything you need to track household and student budgets without complex spreadsheets.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--primary-50); color: var(--primary-600);">
+            <i class="fas fa-receipt"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Quick Expense Logging</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Log transactions with quick 1-click amount presets (+₹100, +₹500, +₹1,000) and categorized family tags.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--emerald-50); color: var(--emerald-600);">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Interactive Visual Analytics</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Dynamic Chart.js doughnut breakdowns, category comparison bars, and 6-month historical cashflow curves.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--amber-50); color: var(--amber-600);">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Automated Budget Guardrails</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Intelligent safety checks warn you when expenses exceed monthly earnings or threaten committed savings.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--rose-50); color: var(--rose-600);">
+            <i class="fas fa-piggy-bank"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Committed Savings Targets</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Set and lock monthly savings targets before calculating your daily safe spending allowance.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--sky-50); color: var(--sky-500);">
+            <i class="fas fa-file-csv"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">One-Click CSV Exports</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Export complete transaction logs anytime to CSV for tax planning, Excel analysis, or offline archiving.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--primary-50); color: var(--primary-600);">
+            <i class="fas fa-moon"></i>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Dark & Light Themes</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+            Designed for day and night use with smooth persistent dark mode that respects system preferences.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="steps-section" id="how-it-works">
+    <div class="section-wrap">
+      <div class="section-heading">
+        <h2>Simple 3-Step Financial Discipline</h2>
+        <p>Built for clarity, speed, and long-term wealth preservation.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Log Inflows & Commit Savings</h3>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Record your monthly salary, freelance earnings, and lock your intended monthly savings goal first.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Track Daily Expenditures</h3>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Log day-to-day purchases across Groceries, Rent, Utilities, Transport, and Entertainment in seconds.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Follow Safety Guardrails</h3>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Stay in the green Safe zone with real-time budget utilization meters and intelligent health warnings.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div class="brand-icon" style="width: 32px; height: 32px; font-size: 14px;">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <strong style="font-size: 16px;">SmartTracker</strong>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); max-width: 300px;">
+          Modern enterprise personal finance platform designed for individuals and families.
         </p>
-        <div class="hero-btns">
-            <a href="/" class="btn">Get Started</a>
-            <a href="#services" class="btn btn-accent">Learn More</a>
-        </div>
-    </div>
-</section>
+      </div>
 
-<section class="services section" id="services">
-    <div class="section-title">
-        <h2>Our Services</h2>
-        <p>
-            We provide smart financial tools designed specifically for students to track,
-            analyze, and optimize their expenses.
-        </p>
-    </div>
-    <div class="container">
-        <div class="service-card">
-            <div class="card-content">
-                <h3>Expense Tracking</h3>
-                <p>
-                    Easily record and categorize daily expenses such as food, travel, books,
-                    and entertainment to keep complete control over your spending.
-                </p>
-                <a href="#/" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <div>
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Quick Links</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <a href="/login">Sign In</a>
+          <a href="/register">Create Account</a>
+          <a href="/dashboard">Dashboard</a>
         </div>
+      </div>
 
-        <div class="service-card">
-            <div class="card-content">
-                <h3>Spending Analysis</h3>
-                <p>
-                    Visual analysis of monthly and weekly spending patterns using charts and
-                    reports to help students understand where their money goes.
-                </p>
-                <a href="#/" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <div>
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Security & Tech</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <span>Spring Boot 4.0.0</span>
+          <span>MySQL 8.0 & HikariCP</span>
+          <span>BCrypt Password Hashing</span>
         </div>
-
-        <div class="service-card">
-            <div class="card-content">
-                <h3>Smart Suggestions</h3>
-                <p>
-                    Smart suggestions and alerts to reduce unnecessary expenses, set budgets,
-                    and improve saving habits for better financial planning.
-                </p>
-                <a href="#/" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-   <section class="features section">
-    <div class="section-title">
-        <h2>Why Choose Our Platform</h2>
-        <p>
-            Our student expense tracking system offers practical features that help students
-            manage money efficiently and develop better spending habits.
-        </p>
-    </div>
-    <div class="container">
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <h3>Simple Expense Recording</h3>
-            <p>
-                Students can easily record daily expenses such as food, travel, stationery,
-                and entertainment in a user-friendly interface.
-            </p>
-        </div>
-
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <h3>Clear Expense Analysis</h3>
-            <p>
-                Provides clear summaries and charts that show spending patterns on a daily,
-                weekly, and monthly basis.
-            </p>
-        </div>
-
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-lock"></i>
-            </div>
-            <h3>Secure Data Storage</h3>
-            <p>
-                User expense data is stored securely and can only be accessed by the registered
-                student through their account.
-            </p>
-        </div>
-
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-tachometer-alt"></i>
-            </div>
-            <h3>Quick Entry & Updates</h3>
-            <p>
-                Expenses can be added, edited, or removed quickly, helping students maintain
-                accurate records without delay.
-            </p>
-        </div>
-
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <h3>Student-Friendly Design</h3>
-            <p>
-                Designed specifically for students with a simple layout that makes financial
-                tracking easy even for beginners.
-            </p>
-        </div>
-
-        <div class="feature-card">
-            <div class="icon">
-                <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Accessible Anytime</h3>
-            <p>
-                Students can access their expense records anytime through a web browser on
-                desktop or mobile devices.
-            </p>
-        </div>
-    </div>
-</section>
-
-<section class="stats">
-    <div class="container">
-        <div class="stat-item">
-            <h2>100%</h2>
-            <p>Student Expense Tracking</p>
-        </div>
-        <div class="stat-item">
-            <h2>5+</h2>
-            <p>Expense Categories</p>
-        </div>
-        <div class="stat-item">
-            <h2>12+</h2>
-            <p>Monthly Reports</p>
-        </div>
-        <div class="stat-item">
-            <h2>24/7</h2>
-            <p>System Availability</p>
-        </div>
-        <div class="stat-item">
-            <h2>Easy</h2>
-            <p>Budget Monitoring</p>
-        </div>
-    </div>
-</section>
-
-<section class="gallery section">
-    <div class="section-title">
-        <h2>Our Platform</h2>
-        <p>
-            Visual overview of the student expense tracker, including dashboards,
-            expense entry forms, and summary reports.
-        </p>
-    </div>
-</section>
-
-
-<footer>
-    <div class="container">
-        <div class="footer-box">
-            <h3>About Us</h3>
-            <p>
-                Smart Student Expense Tracker is designed to help students record, monitor,
-                and manage their daily expenses, encouraging better budgeting and financial awareness.
-            </p>
-            <div class="social-icons">
-                <i class="fab fa-facebook-f"></i>
-                <i class="fab fa-twitter"></i>
-                <i class="fab fa-instagram"></i>
-                <i class="fab fa-linkedin-in"></i>
-            </div>
-        </div>
-
-        <div class="footer-box" id="footer">
-            <h3>Quick Links</h3>
-            <p><a href="/" style="color: #bdc3c7; text-decoration: none;">Home</a></p>
-            <p><a href="/dashboard" style="color: #bdc3c7; text-decoration: none;">Dashboard</a></p>
-            <p><a href="/expense_evaluation" style="color: #bdc3c7; text-decoration: none;">Expense Evaluation</a></p>
-            <p><a href="/income" style="color: #bdc3c7; text-decoration: none;">Income Details</a></p>
-   
-        </div>
-
-        <div class="footer-box">
-            <h3>Newsletter</h3>
-            <p>
-                Subscribe to receive updates, budgeting tips, and announcements related
-                to student financial management.
-            </p>
-            <div class="email-form">
-                <input type="email" placeholder="Enter your email">
-                <button class="submit-btn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <div class="copyright">
-        <p>
-            &copy; 2025 Smart Student Expense Tracker. All rights reserved.
-            Developed with <i class="fas fa-heart"></i> to support smart student budgeting.
-        </p>
+    <div class="copyright-bar">
+      &copy; 2026 Smart Expense Tracker • Built by Kirthik • All Rights Reserved
     </div>
-</footer>
+  </footer>
 
+  <script>
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
 
-    <script>
-        // Simple script to add scrolled class to nav when scrolling
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        });
-    </script>
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeIcon(currentTheme);
+    });
+  </script>
 </body>
 </html>

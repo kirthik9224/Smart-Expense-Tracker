@@ -1,239 +1,213 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern enterprise income & savings management page with quick presets, search, and CSV export.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Income & Savings | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1d2671, #c33764);
-            color: #fff;
-            padding: 20px;
-            position: fixed;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* Content */
-        .content {
-            margin-left: 260px;
-            padding: 30px;
-            width: calc(100% - 260px);
-        }
-
-        h2, h3 {
-            margin-bottom: 15px;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-
-        /* Forms */
-        form input, form button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-
-        form button {
-            background: linear-gradient(90deg, #1d2671, #c33764);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        form button:hover {
-            opacity: 0.9;
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th {
-            background: #1d2671;
-            color: white;
-            padding: 12px;
-        }
-
-        table td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table tr:hover {
-            background: #f1f1f1;
-        }
-
-        a.action {
-            color: #c33764;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        a.action:hover {
-            text-decoration: underline;
-        }
-
-        /* Summary */
-        .summary p {
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
+<head th:replace="~{fragments/layout :: head}"></head>
 <body>
+  <div class="app-layout" data-page="income" th:with="activePage='income', pageTitle='Income & Savings Management', pageSubtitle='Record earnings, monitor inflows, and commit to savings targets'">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h2>Expense Tracker</h2>
-    <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-    <a href="/income"><i class="fas fa-wallet"></i> Income & Savings</a>
-    <a href="/expense"><i class="fas fa-receipt"></i> Expense Management</a>
-    <a href="/expense_evaluation"><i class="fas fa-chart-pie"></i> Expense Evaluation</a>
-    <a href="/budget"><i class="fas fa-bell"></i> Budget & Alerts</a>
-    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+    <div class="app-main">
+      <header th:replace="~{fragments/layout :: topbar}"></header>
 
-<!-- Main Content -->
-<div class="content">
+      <div class="page-container">
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-income">
+            <div class="kpi-meta">
+              <h3>Latest Month Income</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(latestTotal, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-success">
+                <i class="fas fa-calendar-alt"></i>
+                <span th:text="${latestMonth != null ? latestMonth : 'No Data'}">2026-10</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+          </div>
 
-    <!-- Add Income -->
-    <div class="card">
-        <h2><i class="fas fa-plus-circle"></i> Add Income</h2>
-        <form method="POST">
-            <input type="number" name="amount" placeholder="Amount" required>
-            <input type="date" name="date" required>
-            <input type="text" name="description" placeholder="Description">
-            <button type="submit">Save Income</button>
-        </form>
+          <div class="kpi-card kpi-savings">
+            <div class="kpi-meta">
+              <h3>Target Savings Allocated</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(savingsAmount, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-warning">
+                <i class="fas fa-bullseye"></i>
+                <span th:text="${latestTotal > 0 ? #numbers.formatDecimal((savingsAmount / latestTotal) * 100, 1, 0) + '% of Income' : '0% of Income'}">0%</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-piggy-bank"></i>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-balance">
+            <div class="kpi-meta">
+              <h3>All-Time Total Inflow</h3>
+              <div class="kpi-value" th:text="'₹ ' + ${#numbers.formatDecimal(totalAllTime, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</div>
+              <div class="kpi-badge badge-info">
+                <i class="fas fa-coins"></i>
+                <span>Cumulative Record</span>
+              </div>
+            </div>
+            <div class="kpi-icon-wrap">
+              <i class="fas fa-vault"></i>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+          <!-- Add Income Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-plus-circle"></i> Record Inflow / Salary</h2>
+            </div>
+            <form method="POST" action="/income" id="mainIncomeForm">
+              <div class="form-group">
+                <label class="form-label">Income Amount (₹)</label>
+                <input type="number" step="0.01" min="0.01" name="amount" id="mainIncAmount" class="form-control" placeholder="0.00" required>
+                <div class="quick-amounts">
+                  <span class="btn-preset" onclick="addAmount('mainIncAmount', 5000)">+₹5,000</span>
+                  <span class="btn-preset" onclick="addAmount('mainIncAmount', 10000)">+₹10,000</span>
+                  <span class="btn-preset" onclick="addAmount('mainIncAmount', 50000)">+₹50,000</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date Received</label>
+                <input type="date" name="date" class="form-control auto-today-date" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Source / Description</label>
+                <input type="text" name="description" class="form-control" placeholder="E.g. Monthly Salary, Freelance project, Rental income" required>
+              </div>
+              <button type="submit" class="btn btn-emerald" style="width: 100%; margin-top: 10px;">
+                <i class="fas fa-check"></i> Save Income Record
+              </button>
+            </form>
+          </div>
+
+          <!-- Savings Target Allocation Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i class="fas fa-bullseye"></i> Set Monthly Savings Goal</h2>
+            </div>
+            <form method="POST" action="/save_savings">
+              <div class="form-group">
+                <label class="form-label">Select Target Month (YYYY-MM)</label>
+                <input type="month" name="month" class="form-control" 
+                       th:value="${latestMonth != null ? latestMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Committed Savings Amount (₹)</label>
+                <input type="number" step="0.01" min="0" name="savings" class="form-control" 
+                       th:value="${savingsAmount > 0 ? savingsAmount : ''}" placeholder="E.g. 15000" required>
+                <small style="color: var(--text-muted); display: block; margin-top: 6px;">
+                  This amount is protected in budget calculations before calculating safe spending.
+                </small>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px;">
+                <i class="fas fa-lock"></i> Update Savings Target
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Income History Table -->
+        <div class="card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h2><i class="fas fa-list-check"></i> Income Log History</h2>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="position: relative; width: 220px;">
+                <input type="text" id="incomeSearchInput" class="form-control" 
+                       placeholder="Search inflows..." 
+                       onkeyup="filterTable('incomeSearchInput', 'incomeTable')"
+                       style="padding-left: 32px; font-size: 13px;">
+                <i class="fas fa-search" style="position: absolute; left: 10px; top: 12px; color: var(--text-muted); font-size: 13px;"></i>
+              </div>
+              <a href="/income/export" class="btn btn-outline btn-sm">
+                <i class="fas fa-file-csv"></i> Export CSV
+              </a>
+            </div>
+          </div>
+
+          <div th:if="${income.empty}" class="empty-state">
+            <i class="fas fa-hand-holding-usd"></i>
+            <h3>No Inflows Recorded</h3>
+            <p>Log your earnings above to start tracking your family income.</p>
+          </div>
+
+          <div th:unless="${income.empty}" class="table-responsive">
+            <table class="table-modern" id="incomeTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Source / Description</th>
+                  <th style="text-align: right;">Amount</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="inc : ${income}">
+                  <td style="color: var(--text-muted); font-size: 13px;" th:text="${inc.incomeDate}">2026-10-11</td>
+                  <td>
+                    <strong th:text="${inc.description != null && !inc.description.blank ? inc.description : 'Salary'}">Salary</strong>
+                  </td>
+                  <td style="text-align: right; font-weight: 700; color: var(--emerald-500);" 
+                      th:text="'+ ₹ ' + ${#numbers.formatDecimal(inc.amount, 1, 'COMMA', 2, 'POINT')}">+ ₹ 0.00</td>
+                  <td style="text-align: right;">
+                    <a th:href="@{'/edit_income/' + ${inc.incomeId}}" class="btn btn-outline btn-sm" style="margin-right: 6px;">
+                      <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <button class="btn btn-danger btn-sm" 
+                            th:onclick="'confirmDelete(\'/delete_income/' + ${inc.incomeId} + '\', \'income record\')'">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Month-Wise Inflows & Savings Breakdown -->
+        <div class="card" th:unless="${monthlyIncome.empty}">
+          <div class="card-header">
+            <h3><i class="fas fa-calendar-check"></i> Monthly Income & Savings Overview</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table-modern">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th style="text-align: right;">Total Income</th>
+                  <th style="text-align: right;">Savings Committed</th>
+                  <th style="text-align: right;">Available Budget</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="m : ${monthlyIncome}">
+                  <td>
+                    <strong th:text="${m.month}">2026-10</strong>
+                  </td>
+                  <td style="text-align: right; font-weight: 700; color: var(--emerald-500);" 
+                      th:text="'₹ ' + ${#numbers.formatDecimal(m.totalIncome, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</td>
+                  <td style="text-align: right; font-weight: 600; color: var(--amber-500);" 
+                      th:text="'₹ ' + ${#numbers.formatDecimal(m.savings, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary-500);" 
+                      th:text="'₹ ' + ${#numbers.formatDecimal(m.totalIncome - m.savings, 1, 'COMMA', 2, 'POINT')}">₹ 0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 
-    <!-- Income History -->
-    <div class="card">
-        <h2><i class="fas fa-history"></i> Income History</h2>
-        <table>
-            <tr>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-            <tr th:each="row : ${income}">
-                <td th:text="|₹${row.amount}|">₹0</td>
-                <td th:text="${row.income_date}">-</td>
-                <td th:text="${row.description}">-</td>
-                <td>
-                    <a class="action" th:href="@{/edit_income/{id}(id=${row.income_id})}">Edit</a> |
-                    <a class="action" th:href="@{/delete_income/{id}(id=${row.income_id})}"
-                       onclick="return confirm('Delete this income?')">Delete</a>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Monthly Summary -->
-    <div class="card summary">
-        <h3><i class="fas fa-calendar"></i> Latest Month Income Summary</h3>
-        <p><b>Month:</b> <span th:text="${latestMonth}">-</span></p>
-        <p><b>Total Income:</b> <span th:text="|₹${latestTotal}|">₹0</span></p>
-    </div>
-
-    <!-- Savings -->
-    <div class="card">
-        <h3><i class="fas fa-piggy-bank"></i> Set Monthly Savings</h3>
-        <form method="POST" action="/save_savings">
-            <input type="month" name="month" required>
-            <input type="number" name="savings" placeholder="Savings Amount" required>
-            <button type="submit">Save Savings</button>
-        </form>
-    </div>
-
-    <!-- Month-wise Income -->
-    <div class="card">
-        <h3><i class="fas fa-table"></i> Month-wise Total Income</h3>
-        <table>
-            <tr>
-                <th>Month</th>
-                <th>Total Income</th>
-                <th>Savings</th>
-            </tr>
-            <tr th:each="m : ${monthlyIncome}">
-                <td th:text="${m.month}">-</td>
-                <td th:text="|₹${m.total_income}|">₹0</td>
-                <td th:text="|₹${m.savings}|">₹0</td>
-            </tr>
-        </table>
-    </div>
-
-</div>
-
+  <div th:replace="~{fragments/layout :: quickAddModals}"></div>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

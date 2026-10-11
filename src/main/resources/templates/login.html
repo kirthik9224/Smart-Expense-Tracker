@@ -1,143 +1,93 @@
+<!--
+  Organization: Orbytes Global Solutions, Owner: Logaraj S, Created at: 2026-10-11
+  Description: Modern authentication login page with fintech design tokens.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login | Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1d2671, #c33764);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            width: 100%;
-            max-width: 420px;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: #1d2671;
-            font-weight: 600;
-        }
-
-        .back-btn i {
-            margin-right: 6px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #1d2671;
-        }
-
-        label {
-            font-weight: 500;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, #1d2671, #c33764);
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .register-link a {
-            text-decoration: none;
-            color: #1d2671;
-            font-weight: 500;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Smart Expense Tracker</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 </head>
-
-<body>
-
-<div class="container">
-
-    <!-- Back Button -->
-    <a href="/" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Back
-    </a>
-
-    <h2>Login</h2>
-
-    <div th:if="${error}" style="background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; text-align: center; border: 1px solid #ffcdd2;" th:text="${error}"></div>
-    <div th:if="${message}" style="background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; text-align: center; border: 1px solid #c8e6c9;" th:text="${message}"></div>
-
-    <form method="POST">
-
-        <label>Email</label>
-        <input type="email" name="email" placeholder="Enter your email" required>
-
-        <label>Password</label>
-        <input type="password" name="password" placeholder="Enter your password" required>
-
-        <button type="submit">Login</button>
-
-    </form>
-
-    <div class="register-link">
-        <p>Don’t have an account? <a href="/register">Create Account</a></p>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.45) 0%, transparent 45%), radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.40) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.25) 0%, transparent 55%), #0B0F19;">
+  <div class="card" style="max-width: 420px; width: 100%; padding: 36px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); background: rgba(21, 28, 44, 0.90); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); color: #F8FAFC;">
+    
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #6366F1, #8B5CF6); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-bottom: 14px; box-shadow: 0 8px 16px rgba(99,102,241,0.3);">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main);">Welcome Back</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Sign in to your Smart Expense Tracker</p>
     </div>
 
-</div>
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert-banner danger" style="padding: 12px 14px; margin-bottom: 20px; font-size: 13px;">
+      <i class="fas fa-triangle-exclamation"></i>
+      <span th:text="${error}">Invalid email or password</span>
+    </div>
 
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div style="position: relative;">
+          <input type="email" name="email" class="form-control" placeholder="name@example.com" style="padding-left: 38px;" required autofocus>
+          <i class="fas fa-envelope" style="position: absolute; left: 14px; top: 14px; color: var(--text-muted); font-size: 14px;"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div style="position: relative;">
+          <input type="password" name="password" id="loginPassword" class="form-control" placeholder="••••••••" style="padding-left: 38px; padding-right: 38px;" required>
+          <i class="fas fa-lock" style="position: absolute; left: 14px; top: 14px; color: var(--text-muted); font-size: 14px;"></i>
+          <i class="fas fa-eye" id="togglePasswordIcon" onclick="togglePasswordVisibility('loginPassword', 'togglePasswordIcon')" 
+             style="position: absolute; right: 14px; top: 14px; color: var(--text-muted); cursor: pointer;"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 14px;">
+        <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-muted);">
+      Don't have an account yet? 
+      <a href="/register" style="font-weight: 600; color: var(--primary-500);">Create an account</a>
+    </div>
+
+    <div style="text-align: center; margin-top: 12px;">
+      <a href="/" style="font-size: 12px; color: var(--text-muted);">
+        <i class="fas fa-arrow-left"></i> Back to Homepage
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+      }
+    }
+  </script>
 </body>
 </html>
